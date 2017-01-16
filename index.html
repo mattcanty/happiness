@@ -1,0 +1,70 @@
+<html>
+    <head>
+        <script>
+            var facebookId;
+            function add(){
+                var date = new Date();
+
+                var record = JSON.stringify({
+                    date:date,
+                    facebookId:facebookId,
+                    mood: document.querySelector('input[name="mood"]:checked').value,
+                    reason: document.querySelector('input[name="reason"]').value
+                });
+
+                var records = localStorage.getItem('records');
+
+                if(!records){
+                    records = new Array();
+                }
+
+                records.push(record);
+                
+                localStorage.setItem('records', records);
+
+                printRecords();
+            }
+
+            function printRecords(){
+                console.log(JSON.parse(localStorage.getItem('records')));
+            }
+
+            printRecords();
+        </script>
+    </head>
+    <body>
+        <script>
+            window.fbAsyncInit = function() {
+                FB.init({
+                    appId      : '1887293011506974',
+                    xfbml      : true,
+                    version    : 'v2.8'
+                });
+                FB.AppEvents.logPageView();
+                FB.getLoginStatus(function(response) {
+                    if (response.status === 'connected') {
+                        console.log('Logged in.');
+                        FB.api('/me', {fields: 'id'}, function(response) {
+                            facebookId = response.id;
+                        });
+                    }
+                    else {
+                        FB.login();
+                    }
+                });
+            };
+
+            (function(d, s, id){
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) {return;}
+                js = d.createElement(s); js.id = id;
+                js.src = "https://connect.facebook.net/en_US/sdk.js";
+                fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+        </script>
+        <input type="radio" name="mood" value="happy"> Happy<br>
+        <input type="radio" name="mood" value="sad"> Sad<br />
+        <input type="text" name="reason" placeholder="why?">
+        <button onclick="add()">Add</button>
+    </body>
+</html>
